@@ -5,6 +5,7 @@ import com.strawhats.userregistrationloginsystem.model.AppRole;
 import com.strawhats.userregistrationloginsystem.model.Role;
 import com.strawhats.userregistrationloginsystem.model.User;
 import com.strawhats.userregistrationloginsystem.payload.JwtResponse;
+import com.strawhats.userregistrationloginsystem.payload.RegisterRequest;
 import com.strawhats.userregistrationloginsystem.payload.UserDTO;
 import com.strawhats.userregistrationloginsystem.repository.RoleRepository;
 import com.strawhats.userregistrationloginsystem.repository.UserRepository;
@@ -40,47 +41,24 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtils jwtUtils;
 
     @Override
-    public UserDTO signUp(UserDTO userDTO) throws RoleNotFoundException {
-        if (userRepository.existsUserByUsername(userDTO.getUsername())) {
-            throw new UserAlreadyExistsException("Username", userDTO.getUsername());
+    public UserDTO signUp(RegisterRequest registerRequest) throws RoleNotFoundException {
+        if (userRepository.existsUserByUsername(registerRequest.getUsername())) {
+            throw new UserAlreadyExistsException("Username", registerRequest.getUsername());
         }
 
-        if (userRepository.existsUserByEmail(userDTO.getEmail())) {
-            throw new UserAlreadyExistsException("Email", userDTO.getEmail());
+        if (userRepository.existsUserByEmail(registerRequest.getEmail())) {
+            throw new UserAlreadyExistsException("Email", registerRequest.getEmail());
         }
 
         User user = new User();
-        user.setUsername(userDTO.getUsername());
-        user.setEmail(userDTO.getEmail());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setUsername(registerRequest.getUsername());
+        user.setEmail(registerRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
 
-        Set<String> strRoles = userDTO.getRoles();
         Set<Role> roles = new HashSet<>();
 
-
-        Role adminRole = roleRepository.findByRoleName(AppRole.ROLE_ADMIN)
-                .orElseThrow(() -> new RoleNotFoundException(String.format("Role : %s not found!", AppRole.ROLE_ADMIN.name())));
         Role userRole = roleRepository.findByRoleName(AppRole.ROLE_USER)
                 .orElseThrow(() -> new RoleNotFoundException(String.format("Role : %s not found!", AppRole.ROLE_USER.name())));
-
-
-        if (strRoles == null || strRoles.isEmpty()) {
-            roles.add(userRole);
-        } else {
-            strRoles.forEach(role -> {
-                switch (role) {
-                    case "admin":
-                        roles.add(adminRole);
-                        break;
-                    case "user":
-                        roles.add(userRole);
-                        break;
-                    default:
-                        roles.add(userRole);
-                        break;
-                }
-            });
-        }
 
         user.setRoles(roles);
         User savedUser = userRepository.save(user);
