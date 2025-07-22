@@ -71,7 +71,7 @@ public class AuthServiceImpl implements AuthService {
     public JwtResponse login(String username, String password) {
         Authentication authentication;
         try {
-            authentication =   authenticationManager.authenticate(
+            authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password))
             ;
         } catch (AuthenticationException e) {
