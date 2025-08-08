@@ -112,7 +112,7 @@ This project is licensed under the **MIT License**.
 
 #### 👨‍💻 Author
 
-[**Strawhat Luffy**](https://github.com/lrduffy)
+[**Strawhat Luffy**](https://github.com/lrdluffy)
 
 ---
 
